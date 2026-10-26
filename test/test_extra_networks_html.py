@@ -35,7 +35,8 @@ class CardFieldsParser(HTMLParser):
     "models/Lora/l'art &amp; café.safetensors",
 ])
 @pytest.mark.parametrize("use_template", [False, True])
-def test_card_filename_and_search_terms_remain_text(initialize, monkeypatch, filename, use_template):
+@pytest.mark.parametrize("field", ["filename", "search_terms"])
+def test_card_filename_and_search_terms_remain_text(initialize, monkeypatch, filename, use_template, field):
     from modules import shared, ui_extra_networks
 
     monkeypatch.setattr(shared, "opts", SimpleNamespace(
@@ -48,7 +49,8 @@ def test_card_filename_and_search_terms_remain_text(initialize, monkeypatch, fil
     ))
     page = ui_extra_networks.ExtraNetworksPage("Lora")
     monkeypatch.setattr(page, "allowed_directories_for_previews", lambda: [])
-    search_terms = [filename, "alias <b>text</b> &amp;"]
+    search_terms = [filename, "alias"] if field == "search_terms" else ["model", "alias"]
+    filename = filename if field == "filename" else "models/Lora/ordinary.safetensors"
     item = {
         "filename": filename,
         "name": "model",
